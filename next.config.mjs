@@ -3,8 +3,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/v1/:path*',
-        destination: 'http://localhost:8080/api/:path*'
+        source: '/api/:path*',
+        destination: 'https://pre-hackverse-man3.onrender.com/api/:path*'
       }
     ]
   }

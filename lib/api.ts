@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken, clearAuth } from './auth';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://pre-hackverse-man3.onrender.com/api',
 });
 
 // Request interceptor — attaches JWT token + Logging
