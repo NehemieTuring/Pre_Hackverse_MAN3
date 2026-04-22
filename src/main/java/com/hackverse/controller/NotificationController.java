@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -22,8 +24,13 @@ public class NotificationController {
     private final NotificationLogRepository logRepository;
     private final UserRepository userRepository;
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Notification Controller is active");
+    }
+
     @GetMapping
-    public ResponseEntity<Page<NotificationLog>> getMyNotifications(
+    public ResponseEntity<?> getMyNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
@@ -35,8 +42,25 @@ public class NotificationController {
                 user.getId(), 
                 PageRequest.of(page, size, Sort.by("sentAt").descending())
         );
+
+        // Map to simplified DTO to avoid circular dependencies and serialization issues
+        List<Map<String, Object>> content = logs.getContent().stream().map(log -> Map.of(
+            "id", log.getId(),
+            "sentAt", log.getSentAt(),
+            "emailType", log.getEmailType(),
+            "status", log.getStatus(),
+            "task", log.getTask() != null ? Map.of(
+                "id", log.getTask().getId(),
+                "title", log.getTask().getTitle()
+            ) : Map.of()
+        )).collect(Collectors.toList());
         
-        return ResponseEntity.ok(logs);
+        return ResponseEntity.ok(Map.of(
+            "content", content,
+            "totalElements", logs.getTotalElements(),
+            "totalPages", logs.getTotalPages(),
+            "last", logs.isLast()
+        ));
     }
 
     @DeleteMapping("/{id}")
