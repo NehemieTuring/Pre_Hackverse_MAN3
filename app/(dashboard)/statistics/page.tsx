@@ -148,8 +148,8 @@ export default function StatisticsPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 11 }} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "var(--foreground)", fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--foreground)", fontSize: 11 }} />
                 <Tooltip contentStyle={{ backgroundColor: "var(--sidebar)", borderColor: "var(--card-border)", borderRadius: 12, fontSize: 13 }} itemStyle={{ color: "var(--foreground)" }} />
                 <Area type="monotone" dataKey="total" name="Total" stroke="#3b82f6" strokeWidth={2} fill="url(#gradTotal)" />
                 <Area type="monotone" dataKey="done" name="Terminées" stroke="#10b981" strokeWidth={2} fill="url(#gradDone)" />
@@ -160,7 +160,7 @@ export default function StatisticsPage() {
 
         {/* Pie chart — quadrants */}
         <div style={{ ...card, padding: "24px 28px" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 20px", color: "#f1f5f9" }}>Par quadrant</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 20px", color: "var(--foreground)" }}>Par quadrant</h3>
           <div style={{ height: 150 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -175,7 +175,7 @@ export default function StatisticsPage() {
             {quadrantData.map((q) => (
               <div key={q.name} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: q.color, flexShrink: 0 }} />
-                <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(148,163,184,0.8)" }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--foreground)" }}>
                   {q.name} ({q.value})
                 </span>
               </div>
@@ -186,13 +186,13 @@ export default function StatisticsPage() {
 
       {/* Bar chart — quadrant comparison */}
       <div style={{ ...card, padding: "24px 28px" }}>
-        <h3 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 24px", color: "#f1f5f9" }}>Tâches par quadrant Eisenhower</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 24px", color: "var(--foreground)" }}>Tâches par quadrant Eisenhower</h3>
         <div style={{ height: 200 }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={quadrantData} barSize={40}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 12 }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 11 }} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "var(--foreground)", fontSize: 12 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--foreground)", fontSize: 11 }} />
               <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 13 }} />
               <Bar dataKey="value" name="Tâches" radius={[8, 8, 0, 0]}>
                 {quadrantData.map((e, i) => <Cell key={i} fill={e.color} />)}
