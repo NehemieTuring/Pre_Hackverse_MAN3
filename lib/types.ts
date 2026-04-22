@@ -14,6 +14,7 @@ export interface Task {
   priorityScore: number;
   scheduledStart?: string;
   scheduledEnd?: string;
+  actualTimeSpentMinutes?: number;
 }
 
 export interface User {

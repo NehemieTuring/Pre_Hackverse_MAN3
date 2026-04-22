@@ -229,7 +229,7 @@ export default function TasksPage() {
               onClick={() => setSortBy(sortBy === "date" ? "eisenhower" : "date")}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "8px 16px", borderRadius: 12, borderRadius: 12,
+                padding: "8px 16px", borderRadius: 12,
                background: sortBy === "eisenhower" ? "rgba(245,158,11,0.15)" : "var(--card)",
                border: sortBy === "eisenhower" ? "1px solid rgba(245,158,11,0.3)" : "1px solid var(--card-border)" as any,
                color: sortBy === "eisenhower" ? "#f59e0b" : "var(--muted)",

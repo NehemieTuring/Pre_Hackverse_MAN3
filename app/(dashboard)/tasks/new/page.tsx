@@ -255,7 +255,7 @@ export default function NewTaskPage() {
                 key={q.key} type="button"
                 onClick={() => selectQuadrant(q.key)}
                 style={{
-                  padding: "14px 16px", borderRadius: 14, border: "none",
+                  padding: "14px 16px", borderRadius: 14,
                   background: form.eisenhowerQuadrant === q.key ? q.bg : "rgba(255,255,255,0.03)",
                   border: form.eisenhowerQuadrant === q.key
                     ? `1px solid ${q.border}`

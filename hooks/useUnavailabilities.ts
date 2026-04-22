@@ -57,5 +57,5 @@ export function useUnavailabilities() {
     fetchUnavailabilities();
   }, []);
 
-  return { unavailabilities, loading, fetchUnavailabilities, createUnavailability, deleteUnavailability };
+  return { unavailabilities, loading, fetchUnavailabilities, createUnavailability, deleteUnavailability, updateUnavailability };
 }
