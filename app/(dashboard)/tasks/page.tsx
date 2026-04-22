@@ -2,6 +2,7 @@
 
 import { useTasks } from "@/hooks/useTasks";
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { Plus, Trash2, Play, Pause, Square, LayoutGrid, List as ListIcon, AlertCircle, Eye, ArrowUpDown } from "lucide-react";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import Link from "next/link";
@@ -127,14 +128,22 @@ export default function TasksPage() {
   const [filter, setFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState<"date" | "eisenhower">("date");
 
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search")?.toLowerCase() || "";
+
   const sorted = useMemo(() => {
-    const list = filter === "ALL" ? [...tasks] : tasks.filter(t => t.status === filter);
+    let list = filter === "ALL" ? [...tasks] : tasks.filter(t => t.status === filter);
+    
+    if (searchQuery) {
+      list = list.filter(t => t.title.toLowerCase().includes(searchQuery) || t.description?.toLowerCase().includes(searchQuery));
+    }
+
     if (sortBy === "eisenhower") {
       const order: Record<string, number> = { Q1: 0, Q2: 1, Q3: 2, Q4: 3 };
       return list.sort((a, b) => order[a.eisenhowerQuadrant] - order[b.eisenhowerQuadrant]);
     }
     return list.sort((a, b) => (b.id || 0) - (a.id || 0));
-  }, [tasks, filter, sortBy]);
+  }, [tasks, filter, sortBy, searchQuery]);
 
   const activeTasks = sorted.filter(t => t.status !== "DONE");
   const doneTasks = sorted.filter(t => t.status === "DONE");

@@ -252,10 +252,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Search size={16} color="rgba(148,163,184,0.45)" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }} />
             <input
               placeholder="Rechercher des tâches..."
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val.trim()) {
+                  router.push(`/tasks?search=${encodeURIComponent(val)}`);
+                }
+              }}
               style={{
                 width: "100%", padding: "10px 14px 10px 40px",
                 borderRadius: 12, border: "1px solid rgba(255,255,255,0.07)",
-                background: "rgba(255,255,255,0.04)", color: "#f1f5f9",
+                background: "rgba(255,255,255,0.04)", color: "var(--foreground)",
                 fontSize: 14, fontFamily: "inherit", outline: "none",
                 boxSizing: "border-box", transition: "border 0.2s",
               }}
@@ -277,12 +283,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <button style={{
+            <Link href="/notifications" style={{
               width: 40, height: 40, borderRadius: 11,
               background: "var(--card)",
               border: "1px solid var(--card-border)",
               cursor: "pointer", position: "relative",
               display: "flex", alignItems: "center", justifyContent: "center",
+              textDecoration: "none",
             }}>
               <Bell size={18} color="var(--muted)" />
               <div style={{
@@ -290,7 +297,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 width: 7, height: 7, borderRadius: "50%",
                 background: "#3b82f6", border: `2px solid var(--header)`,
               }} />
-            </button>
+            </Link>
 
             <Link href="/tasks/new" style={{
               display: "inline-flex", alignItems: "center", gap: 6,
