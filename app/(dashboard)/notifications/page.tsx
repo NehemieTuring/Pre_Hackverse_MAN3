@@ -22,7 +22,7 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await api.get("/notifications");
+      const res = await api.get("/user-notifications");
       setNotifications(res.data.content || []);
     } catch (err) {
       toast.error("Impossible de charger les notifications");
@@ -37,7 +37,7 @@ export default function NotificationsPage() {
 
   const deleteNotif = async (id: number) => {
     try {
-      await api.delete(`/notifications/${id}`);
+      await api.delete(`/user-notifications/${id}`);
       setNotifications(notifications.filter(n => n.id !== id));
       toast.success("Notification supprimée");
     } catch {
