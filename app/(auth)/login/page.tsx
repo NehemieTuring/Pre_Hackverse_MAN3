@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [emailFocus, setEmailFocus] = useState(false);
+  const [passFocus, setPassFocus] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
