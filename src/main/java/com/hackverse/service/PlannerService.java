@@ -68,6 +68,8 @@ public class PlannerService {
     @Transactional
     public int applyPlanning(Long userId, List<ScheduledTaskDTO> plan) {
         int count = 0;
+        if (plan == null) return 0;
+        
         for (ScheduledTaskDTO dto : plan) {
             if ("SCHEDULED".equals(dto.getStatus())) {
                 Task task = taskRepository.findById(dto.getTaskId()).orElseThrow();

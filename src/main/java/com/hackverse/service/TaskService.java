@@ -26,6 +26,7 @@ public class TaskService {
                 .dueDate(request.dueDate())
                 .importance(request.importance())
                 .estimatedTimeMinutes(request.estimatedTimeMinutes())
+                .eisenhowerQuadrant(request.eisenhowerQuadrant() != null ? com.hackverse.enums.EisenhowerQuadrant.valueOf(request.eisenhowerQuadrant()) : null)
                 .user(user)
                 .build();
         return taskRepository.save(task);

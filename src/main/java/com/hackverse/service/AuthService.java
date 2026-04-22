@@ -21,6 +21,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final NotificationService notificationService;
 
     public UserResponse register(RegisterRequest request) {
         User user = User.builder()
@@ -30,6 +31,11 @@ public class AuthService {
                 .roles(Set.of("ROLE_USER"))
                 .build();
         user = userRepository.save(user);
+        try {
+            notificationService.sendWelcomeEmail(user);
+        } catch (Exception e) {
+            // Logged inside notificationService
+        }
         return new UserResponse(user.getId(), user.getEmail(), user.getFullName());
     }
 

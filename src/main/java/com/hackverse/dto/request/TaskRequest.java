@@ -8,5 +8,6 @@ public record TaskRequest(
     String description,
     @NotNull @Future LocalDateTime dueDate,
     @Min(1) @Max(5) int importance,
-    @Min(15) int estimatedTimeMinutes
+    @Min(15) int estimatedTimeMinutes,
+    String eisenhowerQuadrant
 ) {}

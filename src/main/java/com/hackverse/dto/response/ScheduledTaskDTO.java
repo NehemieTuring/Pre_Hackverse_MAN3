@@ -1,11 +1,10 @@
 package com.hackverse.dto.response;
 
 import com.hackverse.enums.EisenhowerQuadrant;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDateTime;
 
-@Data @Builder
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class ScheduledTaskDTO {
     private Long taskId;
     private String title;

@@ -8,11 +8,28 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import com.hackverse.dto.request.PasswordChangeRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @PostMapping("/me/change-password")
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody PasswordChangeRequest request) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", "Mot de passe actuel incorrect"));
+        }
+        
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok(java.util.Map.of("message", "Mot de passe mis à jour avec succès"));
+    }
 
     @GetMapping("/me")
     public ResponseEntity<User> getMe(@AuthenticationPrincipal UserDetails userDetails) {

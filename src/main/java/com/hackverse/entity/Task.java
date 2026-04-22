@@ -55,10 +55,12 @@ public class Task {
         this.urgency = UrgencyCalculatorService.calculateUrgency(this.dueDate, LocalDateTime.now());
         
         // Eisenhower logic
-        if (this.importance >= 4 && this.urgency >= 4) this.eisenhowerQuadrant = EisenhowerQuadrant.Q1;
-        else if (this.importance >= 4 && this.urgency < 4) this.eisenhowerQuadrant = EisenhowerQuadrant.Q2;
-        else if (this.importance < 4 && this.urgency >= 4) this.eisenhowerQuadrant = EisenhowerQuadrant.Q3;
-        else this.eisenhowerQuadrant = EisenhowerQuadrant.Q4;
+        if (this.eisenhowerQuadrant == null) {
+            if (this.importance >= 4 && this.urgency >= 4) this.eisenhowerQuadrant = EisenhowerQuadrant.Q1;
+            else if (this.importance >= 4 && this.urgency < 4) this.eisenhowerQuadrant = EisenhowerQuadrant.Q2;
+            else if (this.importance < 4 && this.urgency >= 4) this.eisenhowerQuadrant = EisenhowerQuadrant.Q3;
+            else this.eisenhowerQuadrant = EisenhowerQuadrant.Q4;
+        }
 
         // Composite priority score
         long daysRef = ChronoUnit.DAYS.between(java.time.LocalDate.now(), this.dueDate.toLocalDate());

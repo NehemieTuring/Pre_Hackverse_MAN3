@@ -41,6 +41,20 @@ public class NotificationService {
         }
     }
 
+    public void sendWelcomeEmail(com.hackverse.entity.User user) {
+        try {
+            var message = mailSender.createMimeMessage();
+            var helper = new MimeMessageHelper(message, true);
+            helper.setTo(user.getEmail());
+            helper.setSubject("Bienvenue sur Hackverse ! 🚀");
+            helper.setText("Bonjour " + user.getFullName() + ",\n\nBienvenue dans l'aventure Hackverse ! Votre compte est maintenant actif.\n\nPréparez-vous à booster votre productivité avec notre IA.\n\nL'équipe Hackverse", true);
+            
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error("Failed to send welcome email to " + user.getEmail(), e);
+        }
+    }
+
     private void sendEmail(Task task) {
         try {
             var message = mailSender.createMimeMessage();
