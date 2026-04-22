@@ -295,17 +295,7 @@ export default function SettingsPage() {
                   cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
                   fontFamily: "inherit", transition: "all 0.2s",
                 }}>
-                <Lock size={16} color="#94a3b8" /> Changer le mot de passe
-              </button>
-              <button style={{
-                padding: "13px 16px", borderRadius: 12,
-                background: "rgba(248,113,113,0.05)",
-                border: "1px solid rgba(248,113,113,0.15)",
-                color: "#f87171", fontWeight: 700, fontSize: 14,
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
-                fontFamily: "inherit",
-              }}>
-                <Trash2 size={16} /> Supprimer le compte
+                <Lock size={16} color="#fff" /> Changer le mot de passe
               </button>
             </div>
           </div>

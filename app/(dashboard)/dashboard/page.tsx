@@ -205,7 +205,7 @@ export default function DashboardPage() {
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--muted)', fontSize: 11 }} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.6)", fontSize: 11 }} />
                 <Tooltip contentStyle={{ backgroundColor: 'var(--sidebar)', borderColor: 'var(--card-border)', borderRadius: 12, fontSize: 13 }} itemStyle={{ color: 'var(--foreground)' }} />
                 <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} fill="url(#grad1)" />
               </AreaChart>

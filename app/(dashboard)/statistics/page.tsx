@@ -191,8 +191,8 @@ export default function StatisticsPage() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={quadrantData} barSize={40}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 11 }} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 12 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 11 }} />
               <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 13 }} />
               <Bar dataKey="value" name="Tâches" radius={[8, 8, 0, 0]}>
                 {quadrantData.map((e, i) => <Cell key={i} fill={e.color} />)}
