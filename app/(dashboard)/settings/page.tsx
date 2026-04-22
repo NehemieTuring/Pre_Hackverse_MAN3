@@ -291,11 +291,11 @@ export default function SettingsPage() {
                   padding: "13px 16px", borderRadius: 12,
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.09)",
-                  color: "#f1f5f9", fontWeight: 700, fontSize: 14,
+                  color: "var(--foreground)", fontWeight: 700, fontSize: 14,
                   cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
                   fontFamily: "inherit", transition: "all 0.2s",
                 }}>
-                <Lock size={16} color="#fff" /> Changer le mot de passe
+                <Lock size={16} color="var(--accent)" /> Changer le mot de passe
               </button>
             </div>
           </div>

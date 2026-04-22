@@ -313,7 +313,7 @@ export default function TasksPage() {
               return (
                 <div key={qKey} style={{ borderRadius: 20, background: qm.bg, border: `1px solid ${qm.border}`, overflow: "hidden" }}>
                   <div style={{ padding: "16px 20px", borderBottom: `1px solid ${qm.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div><h3 style={{ fontWeight: 900, fontSize: 15, margin: 0, color: qm.color }}>{qm.label}</h3><p style={{ fontSize: 10, color: "rgba(148,163,184,0.5)", margin: 0 }}>{qm.desc}</p></div>
+                    <div><h3 style={{ fontWeight: 900, fontSize: 15, margin: 0, color: qm.color }}>{qm.label}</h3><p style={{ fontSize: 10, color: "var(--muted)", margin: 0 }}>{qm.desc}</p></div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: qm.color }}>{qTasks.length}</span>
                   </div>
                   <div style={{ padding: "12px", display: "flex", flexDirection: "column", gap: 8, minHeight: 100 }}>
@@ -322,7 +322,7 @@ export default function TasksPage() {
                         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
                           <CheckCircle done={task.status === "DONE"} onChange={() => toggleDone(task)} />
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontWeight: 700, fontSize: 13, margin: 0, color: task.status === "DONE" ? "rgba(148,163,184,0.3)" : "#f1f5f9", textDecoration: task.status === "DONE" ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{task.title}</p>
+                            <p style={{ fontWeight: 700, fontSize: 13, margin: 0, color: task.status === "DONE" ? "var(--muted)" : "var(--foreground)", textDecoration: task.status === "DONE" ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{task.title}</p>
                           </div>
                         </div>
                       </Link>
