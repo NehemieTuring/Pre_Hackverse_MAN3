@@ -6,6 +6,7 @@ import { saveAuth } from "@/lib/auth";
 import api from "@/lib/api";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -266,7 +268,7 @@ export default function LoginPage() {
                   opacity: 0.5,
                 }}>🔒</span>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
@@ -275,7 +277,7 @@ export default function LoginPage() {
                   placeholder="••••••••••"
                   style={{
                     width: "100%",
-                    padding: "16px 16px 16px 48px",
+                    padding: "16px 48px",
                     borderRadius: 16,
                     border: passFocus ? "2px solid var(--accent)" : "2px solid var(--card-border)",
                     background: "var(--card)",
@@ -288,6 +290,26 @@ export default function LoginPage() {
                     fontFamily: "inherit",
                   }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: 16,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    color: "var(--muted)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0,
+                  }}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
             </div>
 

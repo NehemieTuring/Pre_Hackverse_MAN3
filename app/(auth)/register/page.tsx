@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [formData, setFormData] = useState({ email: "", password: "", fullName: "" });
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -187,15 +189,40 @@ export default function RegisterPage() {
                     pointerEvents: "none", opacity: 0.5,
                   }}>{icon}</span>
                   <input
-                    type={type}
+                    type={key === "password" && showPassword ? "text" : type}
                     required
                     placeholder={placeholder}
                     value={(formData as any)[key]}
                     onChange={e => setFormData({ ...formData, [key]: e.target.value })}
                     onFocus={() => setFocused(key)}
                     onBlur={() => setFocused(null)}
-                    style={inputStyle(key)}
+                    style={{
+                      ...inputStyle(key),
+                      paddingRight: key === "password" ? 48 : 16,
+                    }}
                   />
+                  {key === "password" && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        right: 16,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "none",
+                        border: "none",
+                        color: "var(--muted)",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: 0,
+                      }}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
