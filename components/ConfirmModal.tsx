@@ -44,11 +44,11 @@ export function ConfirmModal({
       <div style={{
         position: "relative", zIndex: 1,
         width: "100%", maxWidth: "420px",
-        background: "#0f172a",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "var(--sidebar)",
+        border: "1px solid var(--card-border)",
         borderRadius: "28px",
         padding: "32px",
-        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)",
         animation: "modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
       }}>
         <div style={{
@@ -61,11 +61,11 @@ export function ConfirmModal({
           <AlertTriangle size={28} color={isDestructive ? "#f87171" : "#60a5fa"} />
         </div>
 
-        <h2 style={{ fontSize: "22px", fontWeight: 900, color: "#f8fafc", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
+        <h2 style={{ fontSize: "22px", fontWeight: 900, color: "var(--foreground)", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
           {title}
         </h2>
         
-        <p style={{ fontSize: "15px", color: "rgba(148, 163, 184, 0.8)", margin: "0 0 32px", lineHeight: "1.6" }}>
+        <p style={{ fontSize: "15px", color: "var(--muted)", margin: "0 0 32px", lineHeight: "1.6" }}>
           {message}
         </p>
 
@@ -74,9 +74,9 @@ export function ConfirmModal({
             onClick={onClose}
             style={{
               flex: 1, padding: "14px", borderRadius: "14px",
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.05)",
-              color: "#f1f5f9", fontWeight: 700, fontSize: "14px",
+              border: "1px solid var(--card-border)",
+              background: "var(--card)",
+              color: "var(--foreground)", fontWeight: 700, fontSize: "14px",
               cursor: "pointer", transition: "all 0.2s",
             }}>
             Annuler

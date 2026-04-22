@@ -7,8 +7,8 @@ import { toast } from "sonner";
 import { User, Mail, Bell, Shield, Save, Pencil, X, CheckCircle, Lock, Trash2 } from "lucide-react";
 
 const card = {
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "var(--card)",
+  border: "1px solid var(--card-border)",
   borderRadius: 20,
 } as const;
 
@@ -16,9 +16,9 @@ const inputBase = {
   width: "100%",
   padding: "13px 16px",
   borderRadius: 12,
-  border: "1px solid rgba(255,255,255,0.08)",
-  background: "rgba(255,255,255,0.04)",
-  color: "#f1f5f9",
+  border: "1px solid var(--card-border)",
+  background: "var(--card)",
+  color: "var(--foreground)",
   fontSize: 15,
   fontFamily: "inherit",
   outline: "none",
@@ -32,7 +32,7 @@ const labelStyle = {
   fontWeight: 700,
   letterSpacing: "0.1em",
   textTransform: "uppercase" as const,
-  color: "rgba(148,163,184,0.7)",
+  color: "var(--muted)",
   marginBottom: 8,
 };
 
@@ -47,6 +47,35 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [fEmail, setFEmail] = useState(false);
   const [fName, setFName] = useState(false);
+
+  // Password Modal
+  const [showPassModal, setShowPassModal] = useState(false);
+  const [passData, setPassData] = useState({ current: "", new: "", confirm: "" });
+  const [passLoading, setPassLoading] = useState(false);
+  const [f1, setF1] = useState(false);
+  const [f2, setF2] = useState(false);
+  const [f3, setF3] = useState(false);
+
+  const handlePassChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passData.new !== passData.confirm) return toast.error("Les mots de passe ne correspondent pas.");
+    if (passData.new.length < 6) return toast.error("Le nouveau mot de passe doit faire au moins 6 caractères.");
+    
+    try {
+      setPassLoading(true);
+      await api.post("/users/me/change-password", {
+        currentPassword: passData.current,
+        newPassword: passData.new
+      });
+      toast.success("Mot de passe mis à jour !");
+      setShowPassModal(false);
+      setPassData({ current: "", new: "", confirm: "" });
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Erreur lors du changement de mot de passe.");
+    } finally {
+      setPassLoading(false);
+    }
+  };
 
   const handleUpdate = async () => {
     try {
@@ -78,12 +107,13 @@ export default function SettingsPage() {
   const initial = user?.fullName?.charAt(0)?.toUpperCase() || "U";
 
   return (
-    <div style={{
+    <>
+      <div style={{
       padding: "32px",
       maxWidth: 900,
       margin: "0 auto",
       fontFamily: "'Inter', -apple-system, sans-serif",
-      color: "#f1f5f9",
+      color: "var(--foreground)",
       display: "flex",
       flexDirection: "column",
       gap: 24,
@@ -115,7 +145,7 @@ export default function SettingsPage() {
             <div style={{
               position: "absolute", bottom: -4, right: -4,
               width: 22, height: 22, borderRadius: "50%",
-              background: "#10b981", border: "3px solid #0f172a",
+              background: "#10b981", border: "3px solid var(--background)",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
               <CheckCircle size={12} color="#fff" />
@@ -123,7 +153,7 @@ export default function SettingsPage() {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0, color: "#f8fafc", letterSpacing: "-0.03em" }}>
+              <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0, color: "var(--foreground)", letterSpacing: "-0.03em" }}>
                 {user?.fullName}
               </h1>
               <span style={{
@@ -133,7 +163,7 @@ export default function SettingsPage() {
                 color: "#60a5fa", fontSize: 11, fontWeight: 700,
               }}>Pro Student</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(148,163,184,0.8)", fontSize: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--muted)", fontSize: 14 }}>
               <Mail size={14} />
               <span>{user?.email}</span>
             </div>
@@ -213,7 +243,7 @@ export default function SettingsPage() {
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(245,158,11,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Bell size={18} color="#f59e0b" />
               </div>
-              <h3 style={{ fontWeight: 800, fontSize: 15, margin: 0 }}>Notifications</h3>
+              <h3 style={{ fontWeight: 800, fontSize: 15, margin: 0, color: "var(--foreground)" }}>Notifications</h3>
             </div>
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -252,17 +282,19 @@ export default function SettingsPage() {
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Shield size={18} color="#10b981" />
               </div>
-              <h3 style={{ fontWeight: 800, fontSize: 15, margin: 0 }}>Sécurité</h3>
+              <h3 style={{ fontWeight: 800, fontSize: 15, margin: 0, color: "var(--foreground)" }}>Sécurité</h3>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button style={{
-                padding: "13px 16px", borderRadius: 12,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.09)",
-                color: "#f1f5f9", fontWeight: 700, fontSize: 14,
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
-                fontFamily: "inherit",
-              }}>
+              <button 
+                onClick={() => setShowPassModal(true)}
+                style={{
+                  padding: "13px 16px", borderRadius: 12,
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  color: "#f1f5f9", fontWeight: 700, fontSize: 14,
+                  cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
+                  fontFamily: "inherit", transition: "all 0.2s",
+                }}>
                 <Lock size={16} color="#94a3b8" /> Changer le mot de passe
               </button>
               <button style={{
@@ -280,5 +312,92 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
-  );
+
+    {/* Password Modal */}
+    {showPassModal && (
+      <div style={{
+        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+        background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        zIndex: 1000, padding: 20,
+      }}>
+        <div style={{
+          ...card, width: "100%", maxWidth: 440, padding: 32,
+          background: "var(--sidebar)",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
+          animation: "modalFadeUp 0.3s ease-out",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(59,130,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Lock size={20} color="#60a5fa" />
+            </div>
+            <h2 style={{ fontSize: 20, fontWeight: 900, margin: 0, letterSpacing: "-0.02em", color: "var(--foreground)" }}>Changer le mot de passe</h2>
+          </div>
+
+          <form onSubmit={handlePassChange} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div>
+              <label style={labelStyle}>Mot de passe actuel</label>
+              <input 
+                type="password" required
+                value={passData.current}
+                onChange={e => setPassData({...passData, current: e.target.value})}
+                onFocus={() => setF1(true)} onBlur={() => setF1(false)}
+                style={{ ...inputBase, border: f1 ? "1px solid #3b82f6" : inputBase.border }}
+              />
+            </div>
+            <div style={{ width: "100%", height: 1, background: "var(--card-border)" }} />
+            <div>
+              <label style={labelStyle}>Nouveau mot de passe</label>
+              <input 
+                type="password" required
+                value={passData.new}
+                onChange={e => setPassData({...passData, new: e.target.value})}
+                onFocus={() => setF2(true)} onBlur={() => setF2(false)}
+                style={{ ...inputBase, border: f2 ? "1px solid #3b82f6" : inputBase.border }}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Confirmer le nouveau mot de passe</label>
+              <input 
+                type="password" required
+                value={passData.confirm}
+                onChange={e => setPassData({...passData, confirm: e.target.value})}
+                onFocus={() => setF3(true)} onBlur={() => setF3(false)}
+                style={{ ...inputBase, border: f3 ? "1px solid #3b82f6" : inputBase.border }}
+              />
+            </div>
+
+            <div style={{ display: "flex", gap: 12, marginTop: 10 }}>
+              <button 
+                type="button"
+                onClick={() => setShowPassModal(false)}
+                style={{
+                  flex: 1, padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)",
+                  background: "transparent", color: "#94a3b8", fontWeight: 700,
+                  cursor: "pointer", fontFamily: "inherit",
+                }}>Annuler</button>
+              <button 
+                type="submit"
+                disabled={passLoading}
+                style={{
+                  flex: 1.5, padding: "14px", borderRadius: 12, border: "none",
+                  background: "linear-gradient(135deg, #3b82f6, #6366f1)",
+                  color: "#fff", fontWeight: 800, fontSize: 15,
+                  cursor: passLoading ? "not-allowed" : "pointer",
+                  opacity: passLoading ? 0.7 : 1, fontFamily: "inherit",
+                }}>
+                {passLoading ? "Chargement..." : "Mettre à jour"}
+              </button>
+            </div>
+          </form>
+        </div>
+        <style>{`
+          @keyframes modalFadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+      </div>
+    )}
+  </> );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { saveAuth } from "@/lib/auth";
 import api from "@/lib/api";
@@ -11,9 +11,20 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [emailFocus, setEmailFocus] = useState(false);
-  const [passFocus, setPassFocus] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const router = useRouter();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") as any;
+    if (saved) setTheme(saved);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +47,8 @@ export default function LoginPage() {
       width: "100%",
       display: "flex",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      background: "#0f172a",
+      background: "var(--background)",
+      color: "var(--foreground)",
       overflow: "hidden",
     }}>
       {/* Left Panel — Background Image */}
@@ -57,7 +69,7 @@ export default function LoginPage() {
         <div style={{
           position: "absolute",
           inset: 0,
-          background: "linear-gradient(135deg, rgba(15,23,42,0.7) 0%, rgba(59,130,246,0.3) 100%)",
+          background: "linear-gradient(135deg, var(--sidebar) 0%, rgba(59,130,246,0.3) 100%)",
         }} />
         <div style={{
           position: "relative",
@@ -94,13 +106,27 @@ export default function LoginPage() {
             borderRadius: 20,
             padding: 32,
           }}>
-            <p style={{ color: "#f1f5f9", fontSize: 18, fontWeight: 600, lineHeight: 1.6, marginBottom: 16 }}>
+            <p style={{ color: "var(--foreground)", fontSize: 18, fontWeight: 600, lineHeight: 1.6, marginBottom: 16 }}>
               "La gestion du temps n'est pas une compétence, c'est une discipline."
             </p>
-            <p style={{ color: "rgba(148,163,184,0.9)", fontSize: 14, fontWeight: 600 }}>— time-MAN3 Protocol</p>
+            <p style={{ color: "var(--muted)", fontSize: 14, fontWeight: 600 }}>— time-MAN3 Protocol</p>
           </div>
         </div>
       </div>
+
+      {/* Theme Toggle Overlay */}
+      <button 
+        onClick={toggleTheme}
+        style={{
+          position: "fixed", top: 20, right: 20, zIndex: 100,
+          width: 44, height: 44, borderRadius: 12,
+          background: "var(--card)", border: "1px solid var(--card-border)",
+          color: "var(--foreground)", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)", transition: "all 0.2s",
+        }}>
+        {theme === 'dark' ? "☀️" : "🌙"}
+      </button>
 
       {/* Right Panel — Login Form */}
       <div style={{
@@ -155,16 +181,16 @@ export default function LoginPage() {
               color: "#fff",
               fontStyle: "italic",
             }}>T</div>
-            <h1 style={{
-              fontSize: 36,
-              fontWeight: 900,
-              color: "#f8fafc",
-              letterSpacing: "-0.04em",
-              marginBottom: 10,
-            }}>Bon retour ! 👋</h1>
-            <p style={{ color: "rgba(148,163,184,0.9)", fontSize: 16, fontWeight: 500 }}>
-              Connectez-vous à <strong style={{ color: "#60a5fa" }}>time-MAN3</strong>
-            </p>
+             <h1 style={{
+               fontSize: 36,
+               fontWeight: 900,
+               color: "var(--foreground)",
+               letterSpacing: "-0.04em",
+               marginBottom: 10,
+             }}>Bon retour ! 👋</h1>
+             <p style={{ color: "var(--muted)", fontSize: 16, fontWeight: 500 }}>
+               Connectez-vous à <strong style={{ color: "var(--accent)" }}>time-MAN3</strong>
+             </p>
           </div>
 
           {/* Form */}
@@ -177,7 +203,7 @@ export default function LoginPage() {
                 fontWeight: 700,
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                color: "rgba(148,163,184,0.9)",
+                color: "var(--muted)",
                 marginBottom: 8,
               }}>Adresse Email</label>
               <div style={{ position: "relative" }}>
@@ -202,9 +228,9 @@ export default function LoginPage() {
                     width: "100%",
                     padding: "16px 16px 16px 48px",
                     borderRadius: 16,
-                    border: emailFocus ? "2px solid #3b82f6" : "2px solid rgba(255,255,255,0.08)",
-                    background: emailFocus ? "rgba(59,130,246,0.08)" : "rgba(255,255,255,0.04)",
-                    color: "#f1f5f9",
+                    border: emailFocus ? "2px solid var(--accent)" : "2px solid var(--card-border)",
+                    background: "var(--card)",
+                    color: "var(--foreground)",
                     fontSize: 15,
                     fontWeight: 500,
                     outline: "none",
@@ -224,7 +250,7 @@ export default function LoginPage() {
                 fontWeight: 700,
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                color: "rgba(148,163,184,0.9)",
+                color: "var(--muted)",
                 marginBottom: 8,
               }}>Mot de passe</label>
               <div style={{ position: "relative" }}>
@@ -249,9 +275,9 @@ export default function LoginPage() {
                     width: "100%",
                     padding: "16px 16px 16px 48px",
                     borderRadius: 16,
-                    border: passFocus ? "2px solid #3b82f6" : "2px solid rgba(255,255,255,0.08)",
-                    background: passFocus ? "rgba(59,130,246,0.08)" : "rgba(255,255,255,0.04)",
-                    color: "#f1f5f9",
+                    border: passFocus ? "2px solid var(--accent)" : "2px solid var(--card-border)",
+                    background: "var(--card)",
+                    color: "var(--foreground)",
                     fontSize: 15,
                     fontWeight: 500,
                     outline: "none",
@@ -314,18 +340,18 @@ export default function LoginPage() {
             gap: 12,
             margin: "28px 0",
           }}>
-            <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-            <span style={{ color: "rgba(100,116,139,0.8)", fontSize: 12, fontWeight: 600 }}>OU</span>
-            <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+            <div style={{ flex: 1, height: 1, background: "var(--card-border)" }} />
+            <span style={{ color: "var(--muted)", fontSize: 12, fontWeight: 600 }}>OU</span>
+            <div style={{ flex: 1, height: 1, background: "var(--card-border)" }} />
           </div>
 
           {/* Register link */}
           <div style={{ textAlign: "center" }}>
-            <span style={{ color: "rgba(100,116,139,0.9)", fontSize: 15, fontWeight: 500 }}>
+            <span style={{ color: "var(--muted)", fontSize: 15, fontWeight: 500 }}>
               Pas encore de compte ?{" "}
             </span>
             <Link href="/register" style={{
-              color: "#60a5fa",
+              color: "var(--accent)",
               fontWeight: 700,
               fontSize: 15,
               textDecoration: "none",

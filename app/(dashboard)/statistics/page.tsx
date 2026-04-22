@@ -10,8 +10,8 @@ import {
 import { TrendingUp, CheckCircle2, Clock, Zap, Target, BarChart3 } from "lucide-react";
 
 const card = {
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "var(--card)",
+  border: "1px solid var(--card-border)",
   borderRadius: 20,
 } as const;
 
@@ -89,17 +89,17 @@ export default function StatisticsPage() {
       maxWidth: 1280,
       margin: "0 auto",
       fontFamily: "'Inter', -apple-system, sans-serif",
-      color: "#f1f5f9",
+      color: "var(--foreground)",
       display: "flex",
       flexDirection: "column",
       gap: 28,
     }}>
       {/* Header */}
       <div>
-        <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.04em", margin: "0 0 6px", color: "#f8fafc" }}>
+        <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.04em", margin: "0 0 6px", color: "var(--foreground)" }}>
           Statistiques
         </h1>
-        <p style={{ color: "rgba(148,163,184,0.8)", fontSize: 15, margin: 0, fontWeight: 500 }}>
+        <p style={{ color: "var(--muted)", fontSize: 15, margin: 0, fontWeight: 500 }}>
           Analyse de votre productivité en temps réel.
         </p>
       </div>
@@ -115,7 +115,7 @@ export default function StatisticsPage() {
               <k.Icon size={22} color={k.accent} strokeWidth={2} />
             </div>
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(148,163,184,0.65)", margin: "0 0 3px" }}>
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)", margin: "0 0 3px" }}>
                 {k.label}
               </p>
               <p style={{ fontSize: 28, fontWeight: 900, margin: 0, color: k.accent, letterSpacing: "-0.03em" }}>
@@ -132,7 +132,7 @@ export default function StatisticsPage() {
         <div style={{ ...card, padding: "24px 28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
             <TrendingUp size={18} color="#60a5fa" />
-            <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0, color: "#f1f5f9" }}>Activité hebdomadaire</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0, color: "var(--foreground)" }}>Activité hebdomadaire</h3>
           </div>
           <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -148,9 +148,9 @@ export default function StatisticsPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 11 }} />
-                <Tooltip contentStyle={{ backgroundColor: "#1e293b", borderColor: "rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 13 }} itemStyle={{ color: "#fff" }} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 11 }} />
+                <Tooltip contentStyle={{ backgroundColor: "var(--sidebar)", borderColor: "var(--card-border)", borderRadius: 12, fontSize: 13 }} itemStyle={{ color: "var(--foreground)" }} />
                 <Area type="monotone" dataKey="total" name="Total" stroke="#3b82f6" strokeWidth={2} fill="url(#gradTotal)" />
                 <Area type="monotone" dataKey="done" name="Terminées" stroke="#10b981" strokeWidth={2} fill="url(#gradDone)" />
               </AreaChart>

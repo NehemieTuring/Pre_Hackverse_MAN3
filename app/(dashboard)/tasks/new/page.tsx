@@ -9,18 +9,19 @@ import Link from "next/link";
 import { ChevronLeft, Plus, Calendar, Clock, Zap, Target } from "lucide-react";
 
 const card = {
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "var(--card)",
+  border: "1px solid var(--card-border)",
   borderRadius: 20,
+  boxShadow: "var(--card-shadow)",
 } as const;
 
 const inputStyle = (focused: boolean) => ({
   width: "100%",
   padding: "13px 16px",
   borderRadius: 12,
-  border: focused ? "2px solid #3b82f6" : "2px solid rgba(255,255,255,0.08)",
-  background: focused ? "rgba(59,130,246,0.06)" : "rgba(255,255,255,0.04)",
-  color: "#f1f5f9",
+  border: focused ? "2px solid var(--accent)" : "2px solid var(--card-border)",
+  background: "var(--card)",
+  color: "var(--foreground)",
   fontSize: 15,
   fontFamily: "inherit",
   outline: "none",
@@ -34,7 +35,7 @@ const labelStyle = {
   fontWeight: 700,
   letterSpacing: "0.1em",
   textTransform: "uppercase" as const,
-  color: "rgba(148,163,184,0.7)",
+  color: "var(--muted)",
   marginBottom: 8,
 };
 
@@ -104,7 +105,7 @@ export default function NewTaskPage() {
       maxWidth: 760,
       margin: "0 auto",
       fontFamily: "'Inter', -apple-system, sans-serif",
-      color: "#f1f5f9",
+      color: "var(--foreground)",
     }}>
       {/* Back */}
       <Link href="/tasks" style={{
@@ -129,7 +130,7 @@ export default function NewTaskPage() {
           <Plus size={28} color="#fff" strokeWidth={2.5} />
         </div>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 900, margin: "0 0 4px", letterSpacing: "-0.04em", color: "#f8fafc" }}>
+          <h1 style={{ fontSize: 26, fontWeight: 900, margin: "0 0 4px", letterSpacing: "-0.04em", color: "var(--foreground)" }}>
             Nouvelle tâche
           </h1>
           <p style={{ color: "rgba(148,163,184,0.75)", fontSize: 14, margin: 0, fontWeight: 500 }}>
@@ -228,7 +229,7 @@ export default function NewTaskPage() {
                     onClick={() => updateSlider(key as "importance" | "urgency", n)}
                     style={{
                       flex: 1, height: 36, borderRadius: 10, border: "none",
-                      background: n <= value ? color : "rgba(255,255,255,0.06)",
+                      background: n <= value ? color : "var(--background)",
                       cursor: "pointer", transition: "all 0.15s",
                       opacity: n <= value ? 1 : 0.4,
                     }}

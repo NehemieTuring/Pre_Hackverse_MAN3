@@ -1,16 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { toast } from "sonner";
 import Link from "next/link";
 
 export default function RegisterPage() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [formData, setFormData] = useState({ email: "", password: "", fullName: "" });
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") as any;
+    if (saved) setTheme(saved);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +43,9 @@ export default function RegisterPage() {
     width: "100%",
     padding: "16px 16px 16px 48px",
     borderRadius: 16,
-    border: focused === field ? "2px solid #3b82f6" : "2px solid rgba(255,255,255,0.08)",
-    background: focused === field ? "rgba(59,130,246,0.08)" : "rgba(255,255,255,0.04)",
-    color: "#f1f5f9",
+    border: focused === field ? "2px solid var(--accent)" : "2px solid var(--card-border)",
+    background: "var(--card)",
+    color: "var(--foreground)",
     fontSize: 15,
     fontWeight: 500,
     outline: "none",
@@ -47,7 +60,7 @@ export default function RegisterPage() {
     fontWeight: 700,
     letterSpacing: "0.1em",
     textTransform: "uppercase" as const,
-    color: "rgba(148,163,184,0.9)",
+    color: "var(--muted)",
     marginBottom: 8,
   };
 
@@ -63,9 +76,24 @@ export default function RegisterPage() {
       width: "100%",
       display: "flex",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      background: "#0f172a",
+      background: "var(--background)",
+      color: "var(--foreground)",
       overflow: "hidden",
     }}>
+      {/* Theme Toggle Overlay */}
+      <button 
+        onClick={toggleTheme}
+        style={{
+          position: "fixed", top: 20, right: 20, zIndex: 100,
+          width: 44, height: 44, borderRadius: 12,
+          background: "var(--card)", border: "1px solid var(--card-border)",
+          color: "var(--foreground)", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)", transition: "all 0.2s",
+        }}>
+        {theme === 'dark' ? "☀️" : "🌙"}
+      </button>
+
       {/* Left Panel */}
       <div className="left-panel" style={{
         flex: 1,
@@ -83,7 +111,7 @@ export default function RegisterPage() {
         <div style={{
           position: "absolute",
           inset: 0,
-          background: "linear-gradient(135deg, rgba(15,23,42,0.75) 0%, rgba(99,102,241,0.3) 100%)",
+          background: "linear-gradient(135deg, var(--sidebar) 0%, rgba(99,102,241,0.3) 100%)",
         }} />
         <div style={{
           position: "relative",
@@ -139,10 +167,10 @@ export default function RegisterPage() {
               fontSize: 28, fontWeight: 900, color: "#fff",
             }}>✦</div>
             <h1 style={{
-              fontSize: 34, fontWeight: 900, color: "#f8fafc",
+              fontSize: 34, fontWeight: 900, color: "var(--foreground)",
               letterSpacing: "-0.04em", marginBottom: 10,
             }}>Rejoignez time-MAN3 🚀</h1>
-            <p style={{ color: "rgba(148,163,184,0.9)", fontSize: 15, fontWeight: 500 }}>
+            <p style={{ color: "var(--muted)", fontSize: 15, fontWeight: 500 }}>
               Créez votre compte et prenez le contrôle de votre temps.
             </p>
           </div>
@@ -214,17 +242,17 @@ export default function RegisterPage() {
           <div style={{
             display: "flex", alignItems: "center", gap: 12, margin: "28px 0",
           }}>
-            <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-            <span style={{ color: "rgba(100,116,139,0.8)", fontSize: 12, fontWeight: 600 }}>OU</span>
-            <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+            <div style={{ flex: 1, height: 1, background: "var(--card-border)" }} />
+            <span style={{ color: "var(--muted)", fontSize: 12, fontWeight: 600 }}>OU</span>
+            <div style={{ flex: 1, height: 1, background: "var(--card-border)" }} />
           </div>
 
           <div style={{ textAlign: "center" }}>
-            <span style={{ color: "rgba(100,116,139,0.9)", fontSize: 15, fontWeight: 500 }}>
+            <span style={{ color: "var(--muted)", fontSize: 15, fontWeight: 500 }}>
               Déjà un compte ?{" "}
             </span>
             <Link href="/login" style={{
-              color: "#818cf8", fontWeight: 700, fontSize: 15, textDecoration: "none",
+              color: "var(--accent)", fontWeight: 700, fontSize: 15, textDecoration: "none",
             }}>
               Se connecter →
             </Link>

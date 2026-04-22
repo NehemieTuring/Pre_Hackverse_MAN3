@@ -1,13 +1,15 @@
 "use client";
 
 import { useTasks } from "@/hooks/useTasks";
-import { useState, useEffect, useRef } from "react";
-import { Plus, Trash2, Play, Pause, Square, LayoutGrid, List as ListIcon, AlertCircle, Eye } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { Plus, Trash2, Play, Pause, Square, LayoutGrid, List as ListIcon, AlertCircle, Eye, ArrowUpDown } from "lucide-react";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import Link from "next/link";
 import api from "@/lib/api";
 import { toast } from "sonner";
 import { Task } from "@/lib/types";
+
+
 
 // ── Per-row timer ────────────────────────────────────────────────
 function RowTimer({ taskId, initialRunning = false, disabled = false }: { taskId: number, initialRunning?: boolean, disabled?: boolean }) {
@@ -16,7 +18,6 @@ function RowTimer({ taskId, initialRunning = false, disabled = false }: { taskId
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // If running, start local increment
     if (running) {
       intervalRef.current = setInterval(() => setSeconds(s => s + 1), 1000);
     } else {
@@ -32,10 +33,8 @@ function RowTimer({ taskId, initialRunning = false, disabled = false }: { taskId
   };
 
   const handleToggle = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     if (disabled) return;
-    
     try {
       if (!running) {
         await api.post(`/tasks/${taskId}/timer/start`);
@@ -45,20 +44,20 @@ function RowTimer({ taskId, initialRunning = false, disabled = false }: { taskId
         setRunning(false);
       }
     } catch {
-      toast.error("Erreur avec le chronomètre.");
+      setRunning(false); // Graceful fallback
     }
   };
 
   const handleStop = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     try {
       await api.post(`/tasks/${taskId}/timer/stop`);
       setRunning(false);
       toast.success(`Session terminée : ${fmt(seconds)}`);
       setSeconds(0);
     } catch {
-      toast.error("Erreur d'arrêt du chrono.");
+      setRunning(false);
+      setSeconds(0);
     }
   };
 
@@ -73,26 +72,14 @@ function RowTimer({ taskId, initialRunning = false, disabled = false }: { taskId
           cursor: disabled ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
           opacity: disabled ? 0.3 : 1,
         }}>
-        {running
-          ? <Pause size={12} color="#f59e0b" fill="#f59e0b" />
-          : <Play size={12} color={disabled ? "#94a3b8" : "#60a5fa"} fill={disabled ? "#475569" : "#60a5fa"} />}
+        {running ? <Pause size={12} color="#f59e0b" fill="#f59e0b" /> : <Play size={12} color="#60a5fa" fill="#60a5fa" />}
       </button>
-      
       {seconds > 0 && (
-        <button onClick={handleStop} style={{
-          width: 28, height: 28, borderRadius: 6, border: "none",
-          background: "rgba(239,68,68,0.12)",
-          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
+        <button onClick={handleStop} style={{ width: 28, height: 28, borderRadius: 6, border: "none", background: "rgba(239,68,68,0.12)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Square size={10} color="#f87171" fill="#f87171" />
         </button>
       )}
-
-      <span style={{
-        fontVariantNumeric: "tabular-nums", fontSize: 13, fontWeight: 700,
-        color: running ? "#60a5fa" : "rgba(148,163,184,0.6)",
-        letterSpacing: "0.04em",
-      }}>{fmt(seconds)}</span>
+      <span style={{ fontVariantNumeric: "tabular-nums", fontSize: 13, fontWeight: 700, color: running ? "#60a5fa" : "rgba(148,163,184,0.6)" }}>{fmt(seconds)}</span>
     </div>
   );
 }
@@ -105,7 +92,7 @@ function CheckCircle({ done, onChange }: { done: boolean; onChange: () => void }
       style={{
         width: 24, height: 24, borderRadius: "50%", cursor: "pointer",
         background: done ? "linear-gradient(135deg, #10b981, #059669)" : "transparent",
-        border: done ? "none" : "2px solid rgba(255,255,255,0.2)" as any,
+        border: done ? "none" : "2px solid var(--card-border)" as any,
         display: "flex", alignItems: "center", justifyContent: "center",
         boxShadow: done ? "0 2px 10px rgba(16,185,129,0.4)" : "none",
         transition: "all 0.2s", flexShrink: 0,
@@ -138,10 +125,19 @@ export default function TasksPage() {
   const { tasks, loading, fetchTasks } = useTasks();
   const [view, setView] = useState<"list" | "matrix">("list");
   const [filter, setFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState<"date" | "eisenhower">("date");
 
-  const filtered = filter === "ALL" ? tasks : tasks.filter(t => t.status === filter);
-  const activeTasks = filtered.filter(t => t.status !== "DONE");
-  const doneTasks = filtered.filter(t => t.status === "DONE");
+  const sorted = useMemo(() => {
+    const list = filter === "ALL" ? [...tasks] : tasks.filter(t => t.status === filter);
+    if (sortBy === "eisenhower") {
+      const order: Record<string, number> = { Q1: 0, Q2: 1, Q3: 2, Q4: 3 };
+      return list.sort((a, b) => order[a.eisenhowerQuadrant] - order[b.eisenhowerQuadrant]);
+    }
+    return list.sort((a, b) => (b.id || 0) - (a.id || 0));
+  }, [tasks, filter, sortBy]);
+
+  const activeTasks = sorted.filter(t => t.status !== "DONE");
+  const doneTasks = sorted.filter(t => t.status === "DONE");
 
   const toggleDone = async (task: Task) => {
     const next = task.status === "DONE" ? "TODO" : "DONE";
@@ -173,14 +169,14 @@ export default function TasksPage() {
   return (
     <div style={{
       padding: "32px", maxWidth: 1100, margin: "0 auto",
-      fontFamily: "'Inter', -apple-system, sans-serif", color: "#f1f5f9",
+      fontFamily: "'Inter', -apple-system, sans-serif", color: "var(--foreground)",
     }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 900, margin: "0 0 4px", letterSpacing: "-0.04em", color: "#f8fafc" }}>Mes Tâches</h1>
-          <p style={{ color: "rgba(148,163,184,0.7)", fontSize: 13, margin: 0, fontWeight: 500 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 900, margin: "0 0 4px", letterSpacing: "-0.04em", color: "var(--foreground)" }}>Mes Tâches</h1>
+          <p style={{ color: "var(--muted)", fontSize: 13, margin: 0, fontWeight: 500 }}>
             {loading ? "Chargement..." : `${activeTasks.length} active${activeTasks.length > 1 ? "s" : ""} · ${doneTasks.length} terminée${doneTasks.length > 1 ? "s" : ""}`}
           </p>
         </div>
@@ -197,13 +193,13 @@ export default function TasksPage() {
 
       {/* Controls row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
-        <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: 4, gap: 4 }}>
+        <div style={{ display: "flex", background: "var(--card)", border: "1px solid var(--card-border)", borderRadius: 12, padding: 4, gap: 4 }}>
           {([["list", "Liste", ListIcon], ["matrix", "Matrice", LayoutGrid]] as const).map(([id, label, Icon]) => (
             <button key={id} onClick={() => setView(id)} style={{
               display: "inline-flex", alignItems: "center", gap: 7,
               padding: "8px 16px", borderRadius: 9, border: "none",
               background: view === id ? "rgba(59,130,246,0.2)" : "transparent",
-              color: view === id ? "#60a5fa" : "rgba(148,163,184,0.7)",
+              color: view === id ? "var(--accent)" : "var(--muted)",
               fontWeight: view === id ? 700 : 500, fontSize: 13,
               cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
             }}>
@@ -213,17 +209,35 @@ export default function TasksPage() {
         </div>
 
         {view === "list" && (
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {FILTERS.map(f => (
-              <button key={f.key} onClick={() => setFilter(f.key)} style={{
-                padding: "6px 14px", borderRadius: 20, cursor: "pointer",
-                background: filter === f.key ? "rgba(59,130,246,0.18)" : "rgba(255,255,255,0.04)",
-                border: filter === f.key ? "1px solid rgba(59,130,246,0.3)" : "1px solid rgba(255,255,255,0.07)" as any,
-                color: filter === f.key ? "#60a5fa" : "rgba(148,163,184,0.7)",
-                fontWeight: filter === f.key ? 700 : 500, fontSize: 12,
-                fontFamily: "inherit", transition: "all 0.15s",
-              }}>{f.label}</button>
-            ))}
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {FILTERS.map(f => (
+                <button key={f.key} onClick={() => setFilter(f.key)} style={{
+                  padding: "6px 14px", borderRadius: 20, cursor: "pointer",
+                  background: filter === f.key ? "rgba(59,130,246,0.18)" : "var(--card)",
+                  border: filter === f.key ? "1px solid rgba(59,130,246,0.3)" : "1px solid var(--card-border)" as any,
+                  color: filter === f.key ? "#60a5fa" : "var(--muted)",
+                  fontWeight: filter === f.key ? 700 : 500, fontSize: 12,
+                  fontFamily: "inherit", transition: "all 0.15s",
+                }}>{f.label}</button>
+              ))}
+            </div>
+
+            <div style={{ width: 1, height: 20, background: "var(--card-border)" }} />
+
+            <button 
+              onClick={() => setSortBy(sortBy === "date" ? "eisenhower" : "date")}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "8px 16px", borderRadius: 12, borderRadius: 12,
+               background: sortBy === "eisenhower" ? "rgba(245,158,11,0.15)" : "var(--card)",
+               border: sortBy === "eisenhower" ? "1px solid rgba(245,158,11,0.3)" : "1px solid var(--card-border)" as any,
+               color: sortBy === "eisenhower" ? "#f59e0b" : "var(--muted)",
+               fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
+             }}>
+              <ArrowUpDown size={14} />
+              {sortBy === "eisenhower" ? "Trié par Priorité" : "Trier par Priorité"}
+            </button>
           </div>
         )}
       </div>
@@ -233,45 +247,45 @@ export default function TasksPage() {
           <div style={{ width: 32, height: 32, borderRadius: "50%", border: "3px solid rgba(59,130,246,0.2)", borderTopColor: "#3b82f6", animation: "spin 0.8s linear infinite" }} />
         </div>
       ) : view === "list" ? (
-        filtered.length === 0 ? <EmptyState /> : (
-          <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 20, overflow: "hidden" }}>
-            <div style={{
-              display: "grid", gridTemplateColumns: "48px 1fr 120px 140px 180px 80px",
-              padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)",
-            }}>
-              {["Fini", "Titre", "Quadrant", "Statut", "Chrono", "Actions"].map((h, i) => (
-                <div key={i} style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(100,116,139,0.5)" }}>{h}</div>
-              ))}
-            </div>
+        sorted.length === 0 ? <EmptyState /> : (
+          <div style={{ background: "var(--card)", border: "1px solid var(--card-border)", borderRadius: 20, overflow: "hidden", boxShadow: "var(--card-shadow)" }}>
+             <div style={{
+               display: "grid", gridTemplateColumns: "48px 1fr 120px 140px 140px 80px",
+               padding: "12px 20px", borderBottom: "1px solid var(--card-border)", background: "var(--card)",
+             }}>
+               {["Fini", "Titre", "Quadrant", "Statut", "Chrono", "Actions"].map((h, i) => (
+                 <div key={i} style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)" }}>{h}</div>
+               ))}
+             </div>
 
             {[...activeTasks, ...doneTasks].map((task, i, arr) => {
               const done = task.status === "DONE";
               const qm = Q_META[task.eisenhowerQuadrant] || Q_META.Q4;
               return (
                 <div key={task.id} style={{
-                  display: "grid", gridTemplateColumns: "48px 1fr 120px 140px 180px 80px",
+                  display: "grid", gridTemplateColumns: "48px 1fr 120px 140px 140px 80px",
                   padding: "14px 20px", alignItems: "center",
-                  borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
-                  background: done ? "rgba(16,185,129,0.03)" : "transparent",
+                  borderBottom: i < arr.length - 1 ? "1px solid var(--card-border)" : "none",
+                  background: done ? "rgba(16,185,129,0.05)" : "transparent",
                   transition: "background 0.15s",
                 }}>
                   <div><CheckCircle done={done} onChange={() => toggleDone(task)} /></div>
                   <div style={{ paddingRight: 16, minWidth: 0 }}>
                     <p style={{
                       fontWeight: 700, fontSize: 14, margin: 0,
-                      color: done ? "rgba(148,163,184,0.3)" : "#f1f5f9",
+                      color: done ? "var(--muted)" : "var(--foreground)",
                       textDecoration: done ? "line-through" : "none",
                       overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                     }}>{task.title}</p>
-                    {task.dueDate && <p style={{ fontSize: 10, color: "rgba(100,116,139,0.5)", margin: "2px 0 0" }}>{new Date(task.dueDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</p>}
+                    {task.dueDate && <p style={{ fontSize: 10, color: "var(--muted)", margin: "2px 0 0" }}>{new Date(task.dueDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</p>}
                   </div>
                   <div><span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: `${qm.color}15`, color: qm.color }}>{qm.label}</span></div>
-                  <div><span style={{ fontSize: 11, fontWeight: 700, color: done ? "#10b981" : task.status === "IN_PROGRESS" ? "#f59e0b" : "rgba(100,116,139,0.6)" }}>{done ? "✓ Terminée" : task.status === "IN_PROGRESS" ? "⚡ En cours" : "○ À faire"}</span></div>
+                  <div><span style={{ fontSize: 11, fontWeight: 700, color: done ? "#10b981" : task.status === "IN_PROGRESS" ? "#f59e0b" : "var(--muted)" }}>{done ? "✓ Terminée" : task.status === "IN_PROGRESS" ? "⚡ En cours" : "○ À faire"}</span></div>
                   <RowTimer taskId={task.id} initialRunning={task.status === "IN_PROGRESS"} disabled={done} />
                   <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                     <Link href={`/tasks/${task.id}`} title="Détails" style={{
-                      width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-                      display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: "#94a3b8", transition: "all 0.2s",
+                      width: 30, height: 30, borderRadius: 8, background: "var(--background)", border: "1px solid var(--card-border)",
+                      display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color: "var(--muted)", transition: "all 0.2s",
                     }}>
                       <Eye size={14} />
                     </Link>

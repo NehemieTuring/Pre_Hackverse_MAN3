@@ -17,6 +17,8 @@ import {
   Bell,
   Plus,
   Search,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 const NAV = [
@@ -32,6 +34,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") as any;
+    if (saved) setTheme(saved);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -49,9 +64,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div style={{
       display: "flex",
       minHeight: "100vh",
-      background: "#0f172a",
+      background: "var(--background)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      color: "#f1f5f9",
+      color: "var(--foreground)",
       position: "relative",
     }}>
       {/* Background orbs */}
@@ -72,8 +87,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside style={{
         width: collapsed ? 76 : 260,
         minHeight: "100vh",
-        background: "rgba(15,23,42,0.98)",
-        borderRight: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--sidebar)",
+        borderRight: "1px solid var(--card-border)",
         display: "flex",
         flexDirection: "column",
         transition: "width 0.3s ease",
@@ -101,7 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 fontWeight: 900, fontSize: 16, color: "#fff", fontStyle: "italic",
                 boxShadow: "0 4px 16px rgba(59,130,246,0.4)", flexShrink: 0,
               }}>T</div>
-              <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.03em", whiteSpace: "nowrap", color: "#f8fafc" }}>
+              <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.03em", whiteSpace: "nowrap", color: "var(--foreground)" }}>
                 time-MAN3
               </span>
             </div>
@@ -143,9 +158,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 borderRadius: 12,
                 textDecoration: "none",
                 justifyContent: collapsed ? "center" : "flex-start",
-                background: isActive ? "rgba(59,130,246,0.14)" : "transparent",
-                border: isActive ? "1px solid rgba(59,130,246,0.22)" : "1px solid transparent",
-                color: isActive ? "#60a5fa" : "rgba(148,163,184,0.75)",
+                background: isActive ? "rgba(59,130,246,0.12)" : "transparent",
+                border: isActive ? "1px solid rgba(59,130,246,0.2)" : "1px solid transparent",
+                color: isActive ? "var(--accent)" : "var(--muted)",
                 fontWeight: isActive ? 700 : 500,
                 fontSize: 14,
                 transition: "all 0.18s",
@@ -167,13 +182,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* User + Logout */}
-        <div style={{ padding: "12px 10px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{ padding: "12px 10px", borderTop: "1px solid var(--card-border)" }}>
           {!collapsed && (
             <div style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "12px 14px", borderRadius: 12,
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.06)",
+              background: "var(--card)",
+              border: "1px solid var(--card-border)",
               marginBottom: 6,
             }}>
               <div style={{
@@ -183,10 +198,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 fontWeight: 800, fontSize: 14, color: "#fff", flexShrink: 0,
               }}>{initial}</div>
               <div style={{ minWidth: 0, flex: 1 }}>
-                <p style={{ fontWeight: 700, fontSize: 13, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#f1f5f9" }}>
+                <p style={{ fontWeight: 700, fontSize: 13, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--foreground)" }}>
                   {user.fullName}
                 </p>
-                <p style={{ fontSize: 11, color: "rgba(148,163,184,0.55)", margin: 0, fontWeight: 500 }}>Pro Student</p>
+                <p style={{ fontSize: 11, color: "var(--muted)", margin: 0, fontWeight: 500 }}>Pro Student</p>
               </div>
             </div>
           )}
@@ -198,7 +213,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               background: "transparent", cursor: "pointer",
               display: "flex", alignItems: "center",
               justifyContent: collapsed ? "center" : "flex-start",
-              gap: 10, color: "rgba(148,163,184,0.55)",
+              gap: 10, color: "var(--muted)",
               fontSize: 14, fontWeight: 600,
               transition: "all 0.18s", fontFamily: "inherit",
             }}
@@ -226,8 +241,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           height: 72,
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "0 32px",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
-          background: "rgba(15,23,42,0.85)",
+          borderBottom: "1px solid var(--card-border)",
+          background: "var(--header)",
           backdropFilter: "blur(20px)",
           position: "sticky", top: 0, zIndex: 20,
           gap: 16,
@@ -249,18 +264,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           {/* Right actions */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button 
+              onClick={toggleTheme}
+              style={{
+                width: 40, height: 40, borderRadius: 11,
+                background: "var(--card)",
+                border: "1px solid var(--card-border)",
+                cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "var(--muted)", transition: "all 0.2s",
+              }}>
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
             <button style={{
               width: 40, height: 40, borderRadius: 11,
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.07)",
+              background: "var(--card)",
+              border: "1px solid var(--card-border)",
               cursor: "pointer", position: "relative",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-              <Bell size={18} color="#94a3b8" />
+              <Bell size={18} color="var(--muted)" />
               <div style={{
                 position: "absolute", top: 9, right: 9,
                 width: 7, height: 7, borderRadius: "50%",
-                background: "#3b82f6", border: "2px solid #0f172a",
+                background: "#3b82f6", border: `2px solid var(--header)`,
               }} />
             </button>
 

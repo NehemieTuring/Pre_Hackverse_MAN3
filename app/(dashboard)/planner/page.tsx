@@ -17,9 +17,10 @@ const HOURS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")
 const DAY_NAMES = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
 const card = {
-  background: "rgba(255,255,255,0.03)",
-  border: "1px solid rgba(255,255,255,0.06)",
+  background: "var(--card)",
+  border: "1px solid var(--card-border)",
   borderRadius: 24,
+  boxShadow: "var(--card-shadow)",
 };
 
 export default function PlannerPage() {
@@ -144,11 +145,15 @@ export default function PlannerPage() {
     if (!proposedPlan) return;
     try {
       setApplying(true);
-      await api.post("/planner/apply", proposedPlan);
-      toast.success("Planning appliqué !");
+      const res = await api.post<number>("/planner/apply", proposedPlan);
+      const count = res.data;
+      toast.success(`Planning appliqué ! ${count} tâche(s) planifiée(s).`);
       setProposedPlan(null);
-      fetchTasks();
-    } catch { toast.error("Erreur."); }
+      await fetchTasks();
+    } catch (err: any) { 
+      console.error("Apply error:", err?.response?.data || err);
+      toast.error("Erreur lors de l'application du planning."); 
+    }
     finally { setApplying(false); }
   };
 
@@ -171,11 +176,13 @@ export default function PlannerPage() {
     });
     if (prop) return { type: 'PLAN', title: prop.title, color: "#10b981" };
 
+    // Show persisted scheduled tasks (previously applied IA plans)
     const task = tasks.find(t => {
       if (!t.scheduledStart) return false;
-      return new Date(t.scheduledStart).getTime() >= dateStart && new Date(t.scheduledStart).getTime() < dateEnd;
+      const tStart = new Date(t.scheduledStart).getTime();
+      return tStart >= dateStart && tStart < dateEnd;
     });
-    if (task) return { type: 'TASK', title: task.title, color: "#60a5fa" };
+    if (task) return { type: 'TASK', title: task.title, color: "#10b981" };
 
     return null;
   };
@@ -184,7 +191,7 @@ export default function PlannerPage() {
   const unscheduledTasks = tasks.filter(t => !t.scheduledStart && t.status !== 'DONE');
 
   return (
-    <div style={{ padding: "24px 32px", maxWidth: "100%", margin: "0 auto", color: "#f1f5f9" }}>
+    <div style={{ padding: "24px 32px", maxWidth: "100%", margin: "0 auto", color: "var(--foreground)" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 32 }}>
         
         <div>
@@ -194,13 +201,13 @@ export default function PlannerPage() {
               <h1 style={{ fontSize: 26, fontWeight: 900, margin: "0 0 4px" }}>Votre Planning</h1>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <span style={{ fontSize: 18, fontWeight: 800, color: "#818cf8" }}>{viewDate.toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}</span>
-                <input type="month" value={`${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}`} onChange={(e) => setViewDate(new Date(e.target.value))} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", padding: "4px 8px", cursor: "pointer" }} />
+                <input type="month" value={`${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}`} onChange={(e) => setViewDate(new Date(e.target.value))} style={{ background: "var(--card)", border: "1px solid var(--card-border)", borderRadius: 8, color: "var(--foreground)", padding: "4px 8px", cursor: "pointer" }} />
               </div>
             </div>
-            <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: 4 }}>
-              <button onClick={() => setViewDate(new Date(viewDate.setDate(viewDate.getDate() - 7)))} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer" }}><ChevronLeft /></button>
-              <button onClick={() => setViewDate(new Date())} style={{ background: "none", border: "none", color: "#fff", fontWeight: 700, padding: "0 10px" }}>Aujourd&apos;hui</button>
-              <button onClick={() => setViewDate(new Date(viewDate.setDate(viewDate.getDate() + 7)))} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer" }}><ChevronRight /></button>
+            <div style={{ display: "flex", background: "var(--card)", borderRadius: 12, padding: 4 }}>
+              <button onClick={() => setViewDate(new Date(viewDate.setDate(viewDate.getDate() - 7)))} style={{ background: "none", border: "none", color: "var(--foreground)", cursor: "pointer" }}><ChevronLeft /></button>
+              <button onClick={() => setViewDate(new Date())} style={{ background: "none", border: "none", color: "var(--foreground)", fontWeight: 700, padding: "0 10px" }}>Aujourd&apos;hui</button>
+              <button onClick={() => setViewDate(new Date(viewDate.setDate(viewDate.getDate() + 7)))} style={{ background: "none", border: "none", color: "var(--foreground)", cursor: "pointer" }}><ChevronRight /></button>
             </div>
           </div>
 
@@ -208,11 +215,11 @@ export default function PlannerPage() {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", minWidth: 1000 }}>
                 <thead>
-                  <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                    <th style={{ width: 80, padding: "16px", color: "rgba(255,255,255,0.4)" }}>Heure</th>
+                  <tr style={{ background: "var(--card)" }}>
+                    <th style={{ width: 80, padding: "16px", color: "var(--muted)" }}>Heure</th>
                     {weekDays.map((d, i) => (
                       <th key={i} style={{ padding: "16px", textAlign: "left" }}>
-                        <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{DAY_NAMES[i]}</p>
+                        <p style={{ margin: 0, fontSize: 11, color: "var(--muted)" }}>{DAY_NAMES[i]}</p>
                         <p style={{ margin: 0, fontSize: 16 }}>{d.getDate()}</p>
                       </th>
                     ))}
@@ -220,16 +227,16 @@ export default function PlannerPage() {
                 </thead>
                 <tbody>
                   {HOURS.map((hour, hIdx) => (
-                    <tr key={hour} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
-                      <td style={{ textAlign: "center", color: "rgba(255,255,255,0.2)", fontSize: 11 }}>{hour}</td>
+                    <tr key={hour} style={{ borderBottom: "1px solid var(--card-border)" }}>
+                      <td style={{ textAlign: "center", color: "var(--muted)", fontSize: 11 }}>{hour}</td>
                       {DAY_NAMES.map((_, dIdx) => {
                         const content = getCellContent(dIdx, hour);
                         return (
                           <td 
                             key={dIdx} 
                             onDoubleClick={() => handleCellDoubleClick(dIdx, hour)}
-                            style={{ padding: "2px", height: 72, borderLeft: "1px solid rgba(255,255,255,0.03)", transition: "background 0.2s", cursor: "cell" }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
+                            style={{ padding: "2px", height: 72, borderLeft: "1px solid var(--card-border)", transition: "background 0.2s", cursor: "cell" }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = "var(--nav-hover)"}
                             onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                           >
                             {content && (
@@ -278,18 +285,18 @@ export default function PlannerPage() {
       </div>
 
       {showAddFixed && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#1e293b", borderRadius: 32, padding: 32, width: 400 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 20 }}>Nouveau créneau fixe</h2>
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div style={{ background: "var(--sidebar)", border: "1px solid var(--card-border)", borderRadius: 32, padding: 32, width: "100%", maxWidth: 450 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 20, color: "var(--foreground)" }}>Nouveau créneau fixe</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <input value={newFixed.title} onChange={e => setNewFixed({...newFixed, title: e.target.value})} placeholder="Titre (ex: Cours de Maths)" style={{ padding: 14, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }} autoFocus />
-              <div style={{ display: "flex", gap: 10 }}>
-                <input type="datetime-local" value={newFixed.start} onChange={e => setNewFixed({...newFixed, start: e.target.value})} style={{ flex: 1, padding: 10, borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "none", color: "#fff" }} />
-                <input type="datetime-local" value={newFixed.end} onChange={e => setNewFixed({...newFixed, end: e.target.value})} style={{ flex: 1, padding: 10, borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "none", color: "#fff" }} />
+              <input value={newFixed.title} onChange={e => setNewFixed({...newFixed, title: e.target.value})} placeholder="Titre (ex: Cours de Maths)" style={{ padding: 14, borderRadius: 12, background: "var(--card)", border: "1px solid var(--card-border)", color: "var(--foreground)", outline: "none" }} autoFocus />
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <input type="datetime-local" value={newFixed.start} onChange={e => setNewFixed({...newFixed, start: e.target.value})} style={{ flex: "1 1 180px", padding: 10, borderRadius: 10, background: "var(--card)", border: "1px solid var(--card-border)", color: "var(--foreground)", outline: "none" }} />
+                <input type="datetime-local" value={newFixed.end} onChange={e => setNewFixed({...newFixed, end: e.target.value})} style={{ flex: "1 1 180px", padding: 10, borderRadius: 10, background: "var(--card)", border: "1px solid var(--card-border)", color: "var(--foreground)", outline: "none" }} />
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-                <button onClick={handleAddFixed} style={{ flex: 1, padding: 14, borderRadius: 14, background: "#3b82f6", color: "#fff", fontWeight: 800, border: "none" }}>Enregistrer</button>
-                <button onClick={() => setShowAddFixed(false)} style={{ padding: 14, borderRadius: 14, background: "rgba(255,255,255,0.05)", color: "#fff", border: "none" }}>Fermer</button>
+                <button onClick={handleAddFixed} style={{ flex: 1, padding: 14, borderRadius: 14, background: "#3b82f6", color: "#fff", fontWeight: 800, border: "none", cursor: "pointer" }}>Enregistrer</button>
+                <button onClick={() => setShowAddFixed(false)} style={{ padding: 14, borderRadius: 14, background: "var(--card)", border: "1px solid var(--card-border)", color: "var(--foreground)", cursor: "pointer" }}>Fermer</button>
               </div>
             </div>
           </div>

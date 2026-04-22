@@ -17,10 +17,11 @@ import {
 } from "lucide-react";
 
 const card = {
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "var(--card)",
+  border: "1px solid var(--card-border)",
   borderRadius: 20,
   backdropFilter: "blur(12px)",
+  boxShadow: "var(--card-shadow)",
 } as const;
 
 import { useState, useEffect } from "react";
@@ -88,7 +89,7 @@ export default function DashboardPage() {
       maxWidth: 1280,
       margin: "0 auto",
       fontFamily: "'Inter', -apple-system, sans-serif",
-      color: "#f1f5f9",
+      color: "var(--foreground)",
       display: "flex",
       flexDirection: "column",
       gap: 28,
@@ -97,12 +98,12 @@ export default function DashboardPage() {
       {/* Welcome Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
         <div>
-          <h1 style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-0.04em", margin: "0 0 6px", color: "#f8fafc" }}>
+          <h1 style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-0.04em", margin: "0 0 6px", color: "var(--foreground)" }}>
             Bonjour 👋
           </h1>
-          <p style={{ color: "rgba(148,163,184,0.85)", fontSize: 15, margin: 0, fontWeight: 500 }}>
+          <p style={{ color: "var(--muted)", fontSize: 15, margin: 0, fontWeight: 500 }}>
             Vous avez{" "}
-            <strong style={{ color: "#60a5fa" }}>{todoCount} tâche{todoCount > 1 ? "s" : ""}</strong>{" "}
+            <strong style={{ color: "var(--accent)" }}>{todoCount} tâche{todoCount > 1 ? "s" : ""}</strong>{" "}
             en attente aujourd'hui.
           </p>
         </div>
@@ -146,19 +147,23 @@ export default function DashboardPage() {
               <Clock size={22} color="#60a5fa" />
             </div>
             <div>
-              <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#60a5fa", margin: "0 0 4px" }}>
+              <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--accent)", margin: "0 0 4px" }}>
                 Focus Actif
               </p>
-              <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: "#f1f5f9" }}>{activeTask.title}</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: "var(--foreground)" }}>{activeTask.title}</h3>
             </div>
           </div>
-          <Link href="/tasks" style={{
+          <Link href={`/tasks/${activeTask.id}`} style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             padding: "11px 20px", borderRadius: 11,
             background: "rgba(255,255,255,0.1)",
             border: "1px solid rgba(255,255,255,0.15)",
             color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none",
-          }}>
+            transition: "all 0.2s",
+          }}
+          onMouseOver={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
+          onMouseOut={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+          >
             Gérer <ArrowRight size={15} />
           </Link>
         </div>
@@ -175,7 +180,7 @@ export default function DashboardPage() {
               <kpi.Icon size={24} color={kpi.accent} strokeWidth={2} />
             </div>
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(148,163,184,0.7)", margin: "0 0 3px" }}>
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)", margin: "0 0 3px" }}>
                 {kpi.label}
               </p>
               <p style={{ fontSize: 32, fontWeight: 900, margin: 0, color: kpi.accent, letterSpacing: "-0.03em" }}>
@@ -190,7 +195,7 @@ export default function DashboardPage() {
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 20 }}>
         {/* Area chart */}
         <div style={{ ...card, padding: "24px 28px" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 24px", color: "#f1f5f9" }}>Répartition Eisenhower</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 24px", color: "var(--foreground)" }}>Répartition Eisenhower</h3>
           <div style={{ height: 200 }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={quadrantData}>
@@ -200,8 +205,8 @@ export default function DashboardPage() {
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11 }} />
-                <Tooltip contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 13 }} itemStyle={{ color: '#fff' }} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--muted)', fontSize: 11 }} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--sidebar)', borderColor: 'var(--card-border)', borderRadius: 12, fontSize: 13 }} itemStyle={{ color: 'var(--foreground)' }} />
                 <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} fill="url(#grad1)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -210,14 +215,14 @@ export default function DashboardPage() {
 
         {/* Pie chart */}
         <div style={{ ...card, padding: "24px 28px" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 20px", color: "#f1f5f9" }}>Distribution</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 20px", color: "var(--foreground)" }}>Distribution</h3>
           <div style={{ height: 140 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={quadrantData} cx="50%" cy="50%" innerRadius={44} outerRadius={65} paddingAngle={4} dataKey="value" stroke="none">
                   {quadrantData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 13 }} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--sidebar)', borderColor: 'var(--card-border)', borderRadius: 12, fontSize: 13 }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -225,7 +230,7 @@ export default function DashboardPage() {
             {quadrantData.map((q) => (
               <div key={q.name} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: q.color, flexShrink: 0 }} />
-                <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(148,163,184,0.8)" }}>{q.name}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--muted)" }}>{q.name}</span>
               </div>
             ))}
           </div>
@@ -235,10 +240,10 @@ export default function DashboardPage() {
       {/* Recent Tasks */}
       <div style={{ ...card, padding: "24px 28px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0, color: "#f1f5f9" }}>Tâches récentes</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0, color: "var(--foreground)" }}>Tâches récentes</h3>
           <Link href="/tasks" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
-            fontSize: 13, fontWeight: 700, color: "#60a5fa", textDecoration: "none",
+            fontSize: 13, fontWeight: 700, color: "var(--accent)", textDecoration: "none",
           }}>
             Voir tout <ArrowRight size={14} />
           </Link>
@@ -280,10 +285,10 @@ export default function DashboardPage() {
                       flexShrink: 0,
                     }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 2px", color: "#f1f5f9", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 2px", color: "var(--foreground)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {task.title}
                       </p>
-                      <p style={{ fontSize: 11, color: "rgba(148,163,184,0.6)", margin: 0, fontWeight: 500 }}>
+                      <p style={{ fontSize: 11, color: "var(--muted)", margin: 0, fontWeight: 500 }}>
                         {task.dueDate ? new Date(task.dueDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : 'Pas de date'}
                       </p>
                     </div>
