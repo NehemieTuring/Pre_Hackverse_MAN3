@@ -1,5 +1,6 @@
-# ⏱️ Hackverse — Gestion Intelligente du Temps Étudiant
-
+# ⏱️ Hackverse — Gestion Intelligente du Temps Étudiant(time-MAN3)
+# Groupe : MAN3
+# Lien de la solution : https://pre-hackverse-man-30.vercel.app/statistics
 ## Contexte et problématique
 
 Les étudiants font face à un défi constant : **gérer efficacement leur temps** entre les cours, les projets, les révisions et la vie personnelle. La surcharge de tâches, le manque de visibilité sur les priorités et l'absence d'outils adaptés conduisent souvent à une mauvaise organisation, du stress et des échéances manquées.
